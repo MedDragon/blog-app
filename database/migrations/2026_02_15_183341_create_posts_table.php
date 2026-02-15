@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('title');
-            $table->text('content');
-            $table->string('source')->default('Source 1'); // Для логіки розподілу менеджерів
-            $table->string('external_id')->nullable();     // ID угоди в Zoho
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Хто створив (вимога лаби)
+            $table->string('title'); // Заголовок (вимога лаби)
+            $table->text('content'); // Текст (вимога лаби)
+            $table->string('source')->default('Source 1'); // Твій бекграунд для Zoho
+            $table->string('external_id')->nullable(); // Твій бекграунд для Zoho
             $table->timestamps();
         });
     }
