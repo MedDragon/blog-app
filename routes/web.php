@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\PostController;
 use App\Models\Post;
+use App\Http\Controllers\CommentController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -18,7 +19,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard', [
-        'posts' => Post::with('user')->latest()->get()
+        'posts' => Post::with(['user', 'comments.user'])->latest()->get()
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -27,5 +28,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::post('/posts', [PostController::class, 'store'])
+    ->middleware(['auth'])
+    ->name('posts.store');
+
+Route::post('/comments', [CommentController::class, 'store'])->middleware(['auth'])->name('comments.store');
 
 require __DIR__.'/auth.php';
