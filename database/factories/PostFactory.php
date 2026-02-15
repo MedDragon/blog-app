@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\User;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Post>
@@ -17,10 +18,11 @@ class PostFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => \App\Models\User::all()->random()->id, // Беремо випадкового існуючого юзера
-            'title' => fake()->sentence(),
-            'content' => fake()->paragraphs(3, true),
-            'source' => fake()->randomElement(['Source 1', 'Source 2', 'Source 3', 'Source 4', 'Source 5']),
+            // Використовуємо функцію для перевірки наявності юзерів, щоб не було помилки при чистій базі
+            'user_id' => User::exists() ? User::inRandomOrder()->first()->id : User::factory(),
+            'title' => fake()->realText(50), // realText генерує більш змістовні фрази мовою локалізації
+            'content' => fake()->realText(500), // Текст посту українською
+            'source' => 'Джерело ' . fake()->numberBetween(1, 5), // Локалізуємо і джерела
             'external_id' => fake()->uuid(),
         ];
     }

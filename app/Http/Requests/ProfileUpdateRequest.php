@@ -25,6 +25,8 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'avatar' => ['nullable', 'string', 'url', 'max:2000'], // має бути лінком
+            'bio' => ['nullable', 'string', 'max:1000'],          // текст до 1000 символів
         ];
     }
 }

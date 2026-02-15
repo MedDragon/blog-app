@@ -22,91 +22,49 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        <Head title="Register" />
+        <Head title="Створити акаунт" />
+
+        <div class="mb-8">
+            <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tighter">Реєстрація</h1>
+            <p class="text-gray-500 text-sm mt-2">Приєднуйтесь до нашої спільноти</p>
+        </div>
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="name" value="Name" />
-
-                <TextInput
-                    id="name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.name"
-                    required
-                    autofocus
-                    autocomplete="name"
-                />
-
+                <InputLabel for="name" value="Ваше ім'я" class="uppercase text-[10px] font-bold text-indigo-600 tracking-widest" />
+                <TextInput id="name" type="text" class="mt-1 block w-full rounded-xl border-gray-100 shadow-sm" v-model="form.name" required autofocus autocomplete="name" />
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
             <div class="mt-4">
-                <InputLabel for="email" value="Email" />
-
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    required
-                    autocomplete="username"
-                />
-
+                <InputLabel for="email" value="Email" class="uppercase text-[10px] font-bold text-indigo-600 tracking-widest" />
+                <TextInput id="email" type="email" class="mt-1 block w-full rounded-xl border-gray-100 shadow-sm" v-model="form.email" required autocomplete="username" />
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Password" />
-
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    autocomplete="new-password"
-                />
-
+                <InputLabel for="password" value="Пароль" class="uppercase text-[10px] font-bold text-indigo-600 tracking-widest" />
+                <TextInput id="password" type="password" class="mt-1 block w-full rounded-xl border-gray-100 shadow-sm" v-model="form.password" required autocomplete="new-password" />
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
             <div class="mt-4">
-                <InputLabel
-                    for="password_confirmation"
-                    value="Confirm Password"
-                />
-
-                <TextInput
-                    id="password_confirmation"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password_confirmation"
-                    required
-                    autocomplete="new-password"
-                />
-
-                <InputError
-                    class="mt-2"
-                    :message="form.errors.password_confirmation"
-                />
+                <InputLabel for="password_confirmation" value="Підтвердження пароля" class="uppercase text-[10px] font-bold text-indigo-600 tracking-widest" />
+                <TextInput id="password_confirmation" type="password" class="mt-1 block w-full rounded-xl border-gray-100 shadow-sm" v-model="form.password_confirmation" required autocomplete="new-password" />
+                <InputError class="mt-2" :message="form.errors.password_confirmation" />
             </div>
 
-            <div class="mt-4 flex items-center justify-end">
-                <Link
-                    :href="route('login')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                    Already registered?
-                </Link>
-
-                <PrimaryButton
-                    class="ms-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
-                    Register
+            <div class="mt-8">
+                <PrimaryButton class="w-full justify-center py-4 bg-indigo-600 rounded-2xl font-black uppercase tracking-widest text-xs" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                    Зареєструватися
                 </PrimaryButton>
+            </div>
+
+            <div class="mt-8 text-center border-t border-gray-50 pt-6">
+                <p class="text-sm text-gray-500">
+                    Вже маєте акаунт?
+                    <Link :href="route('login')" class="text-indigo-600 font-bold hover:underline">Увійти</Link>
+                </p>
             </div>
         </form>
     </GuestLayout>
