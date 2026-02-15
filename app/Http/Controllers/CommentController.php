@@ -19,6 +19,7 @@ class CommentController extends Controller
             'body' => $validated['body'],
             'post_id' => $validated['post_id'],
             'user_id' => Auth::id(),
+            'parent_id' => $request->parent_id,
         ]);
 
         return redirect()->back();

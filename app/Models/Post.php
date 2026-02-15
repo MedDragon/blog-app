@@ -25,4 +25,13 @@ class Post extends Model
     {
         return $this->hasMany(Comment::class);
     }
+
+    public function likes() {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
+// Допоміжне поле, щоб знати, чи лайкнув поточний юзер цей об'єкт
+    public function getIsLikedAttribute() {
+        return $this->likes()->where('user_id', auth()->id())->exists();
+    }
 }

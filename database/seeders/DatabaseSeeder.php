@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         // Створюємо тестового пешого
         User::factory()->create([
-            'name' => 'Artur Test',
+            'name' => 'Artem Test',
             'email' => 'test@example.com',
             'password' => bcrypt('1'), // щоб точно знати пароль
         ]);
