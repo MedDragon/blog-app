@@ -23,14 +23,29 @@ class ProfileController extends Controller
 
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        // fill() візьме всі дані, включаючи bio та avatar, якщо вони є у ProfileUpdateRequest
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // 1. Заповнюємо базові дані, ігноруючи аватар (його обробимо окремо)
+        $user->fill($request->safe()->except(['avatar', 'avatar_url']));
+
+        // 2. ЛОГІКА АВАТАРА
+        if ($request->hasFile('avatar')) {
+            // Пріоритет 1: Якщо завантажено новий файл
+            $file = $request->file('avatar');
+            $fileName = $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('avatars', $fileName, 'public');
+            $user->avatar = '/storage/' . $path;
+        } elseif ($request->filled('avatar_url')) {
+            // Пріоритет 2: Якщо файлу немає, але вставили посилання
+            $user->avatar = $request->input('avatar_url');
+        }
+        // Пріоритет 3: Якщо обидва поля порожні, ми не чіпаємо старий $user->avatar
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
 
         return Redirect::route('profile.edit');
     }
@@ -42,9 +57,7 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
-
         Auth::logout();
-
         $user->delete();
 
         $request->session()->invalidate();
