@@ -67,4 +67,14 @@ Route::post('/likes/toggle', [LikeController::class, 'toggle'])
     ->middleware(['auth'])
     ->name('likes.toggle');
 
+// Оновлення постів
+Route::patch('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
+
+// Оновлення коментарів
+Route::patch('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
+
+Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+
 require __DIR__.'/auth.php';

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment; // Тепер підключено правильно
 use Illuminate\Http\Request;
-use App\Models\Comment;
 use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
@@ -23,5 +23,31 @@ class CommentController extends Controller
         ]);
 
         return redirect()->back();
+    }
+
+    public function update(Request $request, Comment $comment) // Короткий запис
+    {
+        if ($comment->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'body' => 'required|string|max:2000',
+        ]);
+
+        $comment->update($validated);
+
+        return back()->with('status', 'Коментар оновлено!');
+    }
+
+    public function destroy(Comment $comment)
+    {
+        if ($comment->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $comment->delete();
+
+        return back();
     }
 }

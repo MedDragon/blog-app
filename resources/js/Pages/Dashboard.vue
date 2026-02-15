@@ -1,28 +1,34 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, useForm, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Head, useForm, router, usePage } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
 
 const props = defineProps({
     posts: Array,
 });
 
-// --- СТАН (Збережено з твого старого коду) ---
+const user = computed(() => usePage().props.auth.user);
+
+// --- СТАН ---
 const isPostModalOpen = ref(false);
 const isCommentModalOpen = ref(false);
 const expandedComments = ref({});
 const expandedPosts = ref({});
 const replyPreview = ref(null);
 
-// --- МЕТОДИ (Збережено повністю) ---
-const togglePost = (id) => {
-    expandedPosts.value[id] = !expandedPosts.value[id];
-};
+const editingPostId = ref(null);
+const editingCommentId = ref(null);
 
+// --- ФОРМИ ---
 const postForm = useForm({
     title: '',
     content: '',
     source: 'Source 1',
+});
+
+const editPostForm = useForm({
+    title: '',
+    content: '',
 });
 
 const commentForm = useForm({
@@ -30,6 +36,15 @@ const commentForm = useForm({
     post_id: null,
     parent_id: null,
 });
+
+const editCommentForm = useForm({
+    body: '',
+});
+
+// --- МЕТОДИ ПОСТІВ ---
+const togglePost = (id) => {
+    expandedPosts.value[id] = !expandedPosts.value[id];
+};
 
 const submitPost = () => {
     postForm.post(route('posts.store'), {
@@ -40,6 +55,28 @@ const submitPost = () => {
     });
 };
 
+const startEditPost = (post) => {
+    editingPostId.value = post.id;
+    editPostForm.title = post.title;
+    editPostForm.content = post.content;
+};
+
+const submitEditPost = (id) => {
+    editPostForm.patch(route('posts.update', id), {
+        onSuccess: () => editingPostId.value = null,
+        preserveScroll: true,
+    });
+};
+
+const deletePost = (id) => {
+    if (confirm('Ви впевнені, що хочете видалити цей пост?')) {
+        router.delete(route('posts.destroy', id), {
+            preserveScroll: true,
+        });
+    }
+};
+
+// --- МЕТОДИ КОМЕНТАРІВ ---
 const openCommentModal = (postId, comment = null) => {
     commentForm.reset();
     commentForm.post_id = postId;
@@ -80,6 +117,29 @@ const submitComment = () => {
     });
 };
 
+const startEditComment = (comment) => {
+    editingCommentId.value = comment.id;
+    editCommentForm.body = comment.body.includes('[/quote]')
+        ? comment.body.split('[/quote]')[1].trim()
+        : comment.body;
+};
+
+const submitEditComment = (id) => {
+    editCommentForm.patch(route('comments.update', id), {
+        onSuccess: () => editingCommentId.value = null,
+        preserveScroll: true,
+    });
+};
+
+const deleteComment = (id) => {
+    if (confirm('Видалити цей коментар?')) {
+        router.delete(route('comments.destroy', id), {
+            preserveScroll: true,
+        });
+    }
+};
+
+// --- ІНШЕ ---
 const toggle = (id) => {
     expandedComments.value[id] = !expandedComments.value[id];
 };
@@ -110,25 +170,46 @@ const toggleLike = (id, type) => {
 
                     <div class="p-10 pb-6">
                         <div class="flex justify-between items-start mb-6">
-                            <h3 class="text-3xl font-black text-gray-900 tracking-tight leading-[1.1]">{{ post.title }}</h3>
+                            <div v-if="editingPostId === post.id" class="flex-1 mr-4">
+                                <input v-model="editPostForm.title" class="w-full text-xl font-black border-indigo-100 rounded-xl mb-2 focus:ring-indigo-500" />
+                            </div>
+                            <h3 v-else class="text-3xl font-black text-gray-900 tracking-tight leading-[1.1]">{{ post.title }}</h3>
+
                             <span class="px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-2xl text-[10px] font-black uppercase tracking-widest shrink-0 ml-4 shadow-sm border border-indigo-100/50">
                                 {{ post.source }}
                             </span>
                         </div>
 
                         <div class="text-gray-600 text-[1.05rem] leading-relaxed">
-                            <p class="whitespace-pre-wrap">
-                                {{ expandedPosts[post.id] || post.content.length <= 400
-                                ? post.content
-                                : post.content.substring(0, 400) + '...'
-                                }}
-                            </p>
-                            <button v-if="post.content.length > 400" @click="togglePost(post.id)" class="mt-4 text-indigo-600 font-black uppercase text-[11px] tracking-[0.2em] flex items-center gap-2 hover:gap-3 transition-all duration-300">
-                                <span>{{ expandedPosts[post.id] ? 'Згорнути' : 'Читати повністю' }}</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform" :class="{'rotate-180': expandedPosts[post.id]}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
+                            <div v-if="editingPostId === post.id">
+                                <textarea v-model="editPostForm.content" rows="6" class="w-full border-gray-100 rounded-2xl p-4 focus:ring-indigo-500"></textarea>
+                                <div class="flex gap-2 mt-4">
+                                    <button @click="submitEditPost(post.id)" class="bg-indigo-600 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase">Зберегти</button>
+                                    <button @click="editingPostId = null" class="text-gray-400 text-[10px] font-black uppercase">Скасувати</button>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <p class="whitespace-pre-wrap">
+                                    {{ expandedPosts[post.id] || post.content.length <= 400
+                                    ? post.content
+                                    : post.content.substring(0, 400) + '...'
+                                    }}
+                                </p>
+                                <div class="flex items-center gap-6">
+                                    <button v-if="post.content.length > 400" @click="togglePost(post.id)" class="mt-4 text-indigo-600 font-black uppercase text-[11px] tracking-[0.2em] flex items-center gap-2 hover:gap-3 transition-all duration-300">
+                                        <span>{{ expandedPosts[post.id] ? 'Згорнути' : 'Читати повністю' }}</span>
+                                    </button>
+
+                                    <div v-if="post.user_id === user.id" class="flex gap-4">
+                                        <button @click="startEditPost(post)" class="mt-4 text-gray-400 font-black uppercase text-[11px] tracking-[0.2em] hover:text-indigo-500 transition-colors">
+                                            Редагувати
+                                        </button>
+                                        <button @click="deletePost(post.id)" class="mt-4 text-red-300 font-black uppercase text-[11px] tracking-[0.2em] hover:text-red-600 transition-colors">
+                                            Видалити
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -171,9 +252,24 @@ const toggleLike = (id, type) => {
                                     </div>
                                     <div class="bg-white p-5 rounded-[1.5rem] border border-gray-100 shadow-sm flex-1">
                                         <div class="text-[10px] font-black text-indigo-600 mb-2 uppercase">{{ comment.user.name }}</div>
-                                        <div class="text-gray-700 text-sm">{{ comment.body }}</div>
-                                        <div class="flex gap-5 mt-4 pt-3 border-t border-gray-50 items-center">
+
+                                        <div v-if="editingCommentId === comment.id">
+                                            <textarea v-model="editCommentForm.body" class="w-full border-gray-100 rounded-xl text-sm p-2 mb-2"></textarea>
+                                            <div class="flex gap-2">
+                                                <button @click="submitEditComment(comment.id)" class="text-[9px] font-black text-green-500 uppercase">Оновити</button>
+                                                <button @click="editingCommentId = null" class="text-[9px] font-black text-gray-400 uppercase">Скасувати</button>
+                                            </div>
+                                        </div>
+                                        <div v-else class="text-gray-700 text-sm">{{ comment.body }}</div>
+
+                                        <div class="flex gap-5 mt-4 pt-3 border-t border-gray-50 items-center flex-wrap">
                                             <button @click="openCommentModal(post.id, comment)" class="text-[9px] text-gray-500 font-black uppercase hover:text-indigo-600">Відповісти</button>
+
+                                            <template v-if="comment.user_id === user.id">
+                                                <button @click="startEditComment(comment)" class="text-[9px] text-gray-400 font-black uppercase hover:text-indigo-600">Редагувати</button>
+                                                <button @click="deleteComment(comment.id)" class="text-[9px] text-red-300 font-black uppercase hover:text-red-500">Видалити</button>
+                                            </template>
+
                                             <button @click="toggleLike(comment.id, 'comment')" class="flex items-center gap-1">
                                                 <span :class="comment.is_liked ? 'text-red-500' : 'text-gray-400'" class="text-[11px] font-black">
                                                     {{ comment.is_liked ? '❤' : '♡' }} {{ comment.likes_count || 0 }}
@@ -197,11 +293,26 @@ const toggleLike = (id, type) => {
                                                 {{ reply.body.substring(reply.body.indexOf('[quote]') + 7, reply.body.indexOf('[/quote]')) }}
                                             </div>
                                             <div class="text-[9px] font-black text-gray-800 mb-1 uppercase">{{ reply.user.name }}</div>
-                                            <div class="text-gray-600 text-sm">
+
+                                            <div v-if="editingCommentId === reply.id">
+                                                <textarea v-model="editCommentForm.body" class="w-full border-gray-100 rounded-xl text-sm p-2 mb-2"></textarea>
+                                                <div class="flex gap-2">
+                                                    <button @click="submitEditComment(reply.id)" class="text-[8px] font-black text-green-500 uppercase">Оновити</button>
+                                                    <button @click="editingCommentId = null" class="text-[8px] font-black text-gray-400 uppercase">Скасувати</button>
+                                                </div>
+                                            </div>
+                                            <div v-else class="text-gray-600 text-sm">
                                                 {{ reply.body.includes('[/quote]') ? reply.body.split('[/quote]')[1] : reply.body }}
                                             </div>
-                                            <div class="flex gap-4 mt-3 pt-2 opacity-70">
+
+                                            <div class="flex gap-4 mt-3 pt-2 opacity-70 flex-wrap">
                                                 <button @click="openCommentModal(post.id, reply)" class="text-[8px] text-gray-400 font-black uppercase">Відповісти</button>
+
+                                                <template v-if="reply.user_id === user.id">
+                                                    <button @click="startEditComment(reply)" class="text-[8px] text-gray-400 font-black uppercase">Редагувати</button>
+                                                    <button @click="deleteComment(reply.id)" class="text-[8px] text-red-300 font-black uppercase">Видалити</button>
+                                                </template>
+
                                                 <button @click="toggleLike(reply.id, 'comment')" class="text-[10px] font-black" :class="reply.is_liked ? 'text-red-500' : 'text-gray-400'">
                                                     {{ reply.is_liked ? '❤' : '♡' }} {{ reply.likes_count || 0 }}
                                                 </button>
@@ -216,10 +327,7 @@ const toggleLike = (id, type) => {
             </div>
         </div>
 
-        <button
-            @click="isPostModalOpen = true"
-            class="fixed bottom-10 right-10 z-50 bg-indigo-600 text-white px-8 h-16 rounded-full shadow-[0_20px_60px_rgba(79,70,229,0.4)] hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-3 group"
-        >
+        <button @click="isPostModalOpen = true" class="fixed bottom-10 right-10 z-50 bg-indigo-600 text-white px-8 h-16 rounded-full shadow-[0_20px_60px_rgba(79,70,229,0.4)] hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-3 group">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 group-hover:rotate-90 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
             </svg>
@@ -258,13 +366,3 @@ const toggleLike = (id, type) => {
 
     </AuthenticatedLayout>
 </template>
-
-<style scoped>
-.animate-in {
-    animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-</style>
