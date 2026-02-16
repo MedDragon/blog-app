@@ -17,14 +17,14 @@ const emit = defineEmits([
     'delete-comment', 'toggle-like-comment'
 ]);
 
-// Перевірка прав (Helper functions)
+// Перевірка прав (Твоя логіка)
 const canEditOrDelete = computed(() => {
     if (props.user.role === 'superadmin') return true;
     if (props.user.role === 'admin' && props.post.manager_id === props.user.id) return true;
     return props.post.user_id === props.user.id;
 });
 
-// --- СОРТУВАННЯ КОМЕНТАРІВ (Твоя логіка без змін) ---
+// --- СОРТУВАННЯ КОМЕНТАРІВ (Твоя логіка збережена) ---
 const commentSortMethod = ref('newest');
 const sortedComments = computed(() => {
     let list = props.post.comments.filter(c => !c.parent_id);
@@ -54,7 +54,7 @@ const getRepliesCount = (commentId) => props.post.comments.filter(c => c.parent_
 </script>
 
 <template>
-    <div class="mb-10 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[2.5rem] overflow-hidden border border-white transition-all duration-500 hover:shadow-indigo-100 hover:border-indigo-50">
+    <div class="mb-10 bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-500 hover:border-indigo-500/30">
 
         <div class="p-10 pb-6">
             <div class="flex justify-between items-start mb-6">
@@ -62,62 +62,68 @@ const getRepliesCount = (commentId) => props.post.comments.filter(c => c.parent_
                     <slot name="edit-post-form"></slot>
                 </div>
                 <div v-else class="flex-1">
-                    <h3 class="text-3xl font-black text-gray-900 tracking-tight leading-[1.1]">{{ post.title }}</h3>
-                    <p v-if="user.role === 'superadmin' && post.manager" class="text-[10px] font-bold text-indigo-400 mt-2 uppercase tracking-tighter">
+                    <h3 class="text-3xl font-black text-white tracking-tight leading-[1.1] italic uppercase">
+                        {{ post.title }}
+                    </h3>
+                    <p v-if="user.role === 'superadmin' && post.manager" class="text-[10px] font-black text-indigo-400 mt-3 uppercase tracking-widest">
                         Куратор: {{ post.manager.name }}
                     </p>
                 </div>
-                <span class="px-4 py-1.5 bg-gray-50 text-gray-400 rounded-2xl text-[10px] font-black uppercase tracking-widest shrink-0 ml-4 shadow-sm">
+                <span class="px-4 py-1.5 bg-white/5 text-slate-500 rounded-2xl text-[10px] font-black uppercase tracking-widest shrink-0 ml-4 border border-white/5">
                     ID: {{ post.id }}
                 </span>
             </div>
 
-            <div v-if="editingPostId !== post.id" class="text-gray-600 text-[1.05rem] leading-relaxed">
-                <p class="whitespace-pre-wrap">{{ expandedPosts[post.id] || post.content.length <= 400 ? post.content : post.content.substring(0, 400) + '...' }}</p>
-                <div class="flex items-center gap-6">
-                    <button v-if="post.content.length > 400" @click="$emit('toggle-post', post.id)" class="mt-4 text-indigo-600 font-black uppercase text-[11px] tracking-[0.2em] hover:gap-3 transition-all flex items-center">
+            <div v-if="editingPostId !== post.id" class="text-slate-200 text-[1.05rem] leading-relaxed">
+                <p class="whitespace-pre-wrap opacity-90">
+                    {{ expandedPosts[post.id] || post.content.length <= 400 ? post.content : post.content.substring(0, 400) + '...' }}
+                </p>
+
+                <div class="flex items-center gap-6 mt-6">
+                    <button v-if="post.content.length > 400" @click="$emit('toggle-post', post.id)" class="text-indigo-400 font-black uppercase text-[11px] tracking-[0.2em] hover:text-indigo-300 transition-all flex items-center">
                         {{ expandedPosts[post.id] ? 'Згорнути' : 'Читати повністю' }}
                     </button>
 
                     <div v-if="canEditOrDelete" class="flex gap-4">
-                        <button @click="$emit('start-edit', post)" class="mt-4 text-gray-400 font-black uppercase text-[11px] tracking-[0.2em] hover:text-indigo-500 transition-colors">Редагувати</button>
-                        <button @click="$emit('delete-post', post.id)" class="mt-4 text-red-300 font-black uppercase text-[11px] tracking-[0.2em] hover:text-red-600 transition-colors">Видалити</button>
+                        <button @click="$emit('start-edit', post)" class="text-slate-500 font-black uppercase text-[11px] tracking-[0.2em] hover:text-white transition-colors">Редагувати</button>
+                        <button @click="$emit('delete-post', post.id)" class="text-rose-900 font-black uppercase text-[11px] tracking-[0.2em] hover:text-rose-500 transition-colors">Видалити</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="bg-[#fafbfd]/80 backdrop-blur-sm p-8 pt-6 border-t border-gray-50 flex flex-wrap justify-between items-center">
+        <div class="bg-slate-950/40 backdrop-blur-xl p-8 pt-6 border-t border-white/5 flex flex-wrap justify-between items-center">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-black overflow-hidden shadow-lg ring-4 ring-white">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-black overflow-hidden shadow-lg shadow-indigo-500/20 ring-2 ring-white/10">
                     <img v-if="post.user.avatar" :src="post.user.avatar" class="w-full h-full object-cover" />
                     <span v-else>{{ post.user.name.charAt(0) }}</span>
                 </div>
                 <div class="flex flex-col">
-                    <span class="text-gray-900 font-black text-sm uppercase">{{ post.user.name }}</span>
-                    <span class="text-[10px] text-gray-400 font-bold italic" v-if="post.user.bio">{{ post.user.bio.substring(0, 30) }}...</span>
+                    <span class="text-white font-black text-sm uppercase tracking-tight">{{ post.user.name }}</span>
+                    <span class="text-[10px] text-slate-500 font-bold italic" v-if="post.user.bio">{{ post.user.bio.substring(0, 30) }}...</span>
                 </div>
             </div>
 
             <div class="flex gap-3">
-                <button @click="$emit('toggle-like', post.id)" class="flex items-center gap-2.5 bg-white px-5 py-3 rounded-2xl shadow-sm border border-gray-100 transition active:scale-90 group">
-                    <svg xmlns="http://www.w3.org/2000/svg" :class="post.is_liked ? 'fill-red-500 stroke-red-500' : 'fill-none stroke-gray-400 group-hover:stroke-red-400'" class="w-5 h-5 transition-all duration-300" viewBox="0 0 24 24">
+                <button @click="$emit('toggle-like', post.id)" class="flex items-center gap-2.5 bg-white/5 px-5 py-3 rounded-2xl border border-white/5 transition active:scale-90 group hover:bg-white/10">
+                    <svg xmlns="http://www.w3.org/2000/svg" :class="post.is_liked ? 'fill-rose-500 stroke-rose-500' : 'fill-none stroke-slate-400 group-hover:stroke-rose-400'" class="w-5 h-5 transition-all duration-300" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
-                    <span :class="post.is_liked ? 'text-red-500' : 'text-gray-500'" class="font-black text-xs">{{ post.likes_count || 0 }}</span>
+                    <span :class="post.is_liked ? 'text-rose-500' : 'text-slate-400'" class="font-black text-xs">{{ post.likes_count || 0 }}</span>
                 </button>
-                <button @click="$emit('toggle-comments', post.id)" class="bg-indigo-600 text-white px-6 py-3 rounded-2xl shadow-lg font-black text-xs hover:bg-indigo-700 transition">
+
+                <button @click="$emit('toggle-comments', post.id)" class="bg-indigo-600 text-white px-6 py-3 rounded-2xl shadow-lg shadow-indigo-500/20 font-black text-xs hover:bg-indigo-500 transition uppercase tracking-widest">
                     {{ post.comments_count || 0 }} Відгуків
                 </button>
             </div>
         </div>
 
-        <div v-if="expandedComments[post.id]" class="p-8 pt-0 bg-[#fafbfd]/80 border-t border-gray-50 animate-in">
+        <div v-if="expandedComments[post.id]" class="p-8 pt-0 bg-black/20 border-t border-white/5 animate-in">
             <div class="pt-8 space-y-6">
-                <div class="flex items-center justify-between mb-2 px-2">
-                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Сортувати:</span>
+                <div class="flex items-center justify-between mb-4 px-2">
+                    <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Сортувати:</span>
                     <div class="flex gap-4">
-                        <button v-for="m in ['newest', 'popular', 'active', 'oldest']" :key="m" @click="commentSortMethod = m" :class="commentSortMethod === m ? 'text-indigo-600 scale-110' : 'text-gray-300 hover:text-gray-400'" class="text-[9px] font-black uppercase transition-all tracking-tighter">
+                        <button v-for="m in ['newest', 'popular', 'active', 'oldest']" :key="m" @click="commentSortMethod = m" :class="commentSortMethod === m ? 'text-indigo-400 scale-110' : 'text-slate-600 hover:text-slate-400'" class="text-[9px] font-black uppercase transition-all tracking-tighter">
                             <span v-if="m === 'newest'">Нові</span>
                             <span v-if="m === 'popular'">Топ</span>
                             <span v-if="m === 'active'">Дискусії</span>
@@ -126,8 +132,8 @@ const getRepliesCount = (commentId) => props.post.comments.filter(c => c.parent_
                     </div>
                 </div>
 
-                <button @click="$emit('open-comment-modal', post.id)" class="w-full py-4 rounded-2xl border-2 border-dashed border-gray-200 text-gray-400 font-bold text-xs uppercase hover:border-indigo-300 transition">
-                    + Написати свою думку
+                <button @click="$emit('open-comment-modal', post.id)" class="w-full py-4 rounded-2xl border-2 border-dashed border-white/10 text-slate-500 font-bold text-xs uppercase hover:border-indigo-500/40 hover:text-indigo-400 transition">
+                    + Залишити відгук
                 </button>
 
                 <div v-for="comment in sortedComments" :key="comment.id" class="space-y-4">
@@ -143,7 +149,7 @@ const getRepliesCount = (commentId) => props.post.comments.filter(c => c.parent_
                         <template #edit-form><slot name="edit-comment-form"></slot></template>
                     </CommentItem>
 
-                    <div v-if="expandedComments['child_' + comment.id]" class="ml-14 space-y-4 border-l-2 border-indigo-50 pl-6">
+                    <div v-if="expandedComments['child_' + comment.id]" class="ml-8 md:ml-14 space-y-4 border-l-2 border-indigo-500/20 pl-6">
                         <CommentItem
                             v-for="reply in getReplies(comment.id)" :key="reply.id"
                             :comment="reply" :user="user" :isReply="true" :editingCommentId="editingCommentId"
@@ -160,3 +166,13 @@ const getRepliesCount = (commentId) => props.post.comments.filter(c => c.parent_
         </div>
     </div>
 </template>
+
+<style scoped>
+.animate-in {
+    animation: fadeIn 0.4s ease-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>

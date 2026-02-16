@@ -29,33 +29,68 @@ const submit = () => {
     <GuestLayout>
         <Head title="Новий пароль" />
 
-        <div class="mb-8">
-            <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tighter">Новий старт</h1>
-            <p class="text-gray-500 text-sm mt-2">Встановіть новий надійний пароль</p>
+        <div class="mb-10 text-center relative">
+            <h1 class="text-6xl font-black text-white/[0.03] uppercase italic tracking-tighter absolute -top-6 left-1/2 -translate-x-1/2 select-none whitespace-nowrap">
+                RESET
+            </h1>
+            <h2 class="relative z-10 text-3xl font-black text-white uppercase italic tracking-tighter">
+                Новий <span class="text-indigo-500">старт</span>
+            </h2>
+            <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mt-3 opacity-70">
+                Встановіть новий надійний пароль
+            </p>
         </div>
 
-        <form @submit.prevent="submit">
+        <form @submit.prevent="submit" class="space-y-5">
             <div>
-                <InputLabel for="email" value="Email" class="uppercase text-[10px] font-bold text-gray-400" />
-                <TextInput id="email" type="email" class="mt-1 block w-full bg-gray-50 rounded-xl" v-model="form.email" required readonly autocomplete="username" />
-                <InputError class="mt-2" :message="form.errors.email" />
+                <InputLabel for="email" value="Твій Email" class="uppercase text-[10px] font-black text-slate-500 tracking-widest mb-2 ml-1" />
+                <TextInput
+                    id="email"
+                    type="email"
+                    class="block w-full bg-white/[0.02] border-white/5 text-slate-500 rounded-2xl p-4 font-bold cursor-not-allowed"
+                    v-model="form.email"
+                    required
+                    readonly
+                    autocomplete="username"
+                />
             </div>
 
-            <div class="mt-4">
-                <InputLabel for="password" value="Новий пароль" class="uppercase text-[10px] font-bold text-indigo-600" />
-                <TextInput id="password" type="password" class="mt-1 block w-full rounded-xl" v-model="form.password" required autofocus autocomplete="new-password" />
+            <div>
+                <InputLabel for="password" value="Новий пароль" class="uppercase text-[10px] font-black text-indigo-400 tracking-widest mb-2 ml-1" />
+                <TextInput
+                    id="password"
+                    type="password"
+                    class="block w-full bg-slate-900/50 border-white/10 text-white rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500 transition-all font-bold"
+                    v-model="form.password"
+                    required
+                    autofocus
+                    autocomplete="new-password"
+                    placeholder="••••••••"
+                />
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
-            <div class="mt-4">
-                <InputLabel for="password_confirmation" value="Підтвердження" class="uppercase text-[10px] font-bold text-indigo-600" />
-                <TextInput id="password_confirmation" type="password" class="mt-1 block w-full rounded-xl" v-model="form.password_confirmation" required autocomplete="new-password" />
+            <div>
+                <InputLabel for="password_confirmation" value="Повторіть пароль" class="uppercase text-[10px] font-black text-indigo-400 tracking-widest mb-2 ml-1" />
+                <TextInput
+                    id="password_confirmation"
+                    type="password"
+                    class="block w-full bg-slate-900/50 border-white/10 text-white rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500 transition-all font-bold"
+                    v-model="form.password_confirmation"
+                    required
+                    autocomplete="new-password"
+                    placeholder="••••••••"
+                />
                 <InputError class="mt-2" :message="form.errors.password_confirmation" />
             </div>
 
-            <div class="mt-8">
-                <PrimaryButton class="w-full justify-center py-4 bg-gray-900 rounded-2xl font-black uppercase text-xs" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Оновити пароль
+            <div class="pt-4">
+                <PrimaryButton
+                    class="w-full justify-center py-5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] border-none"
+                    :class="{ 'opacity-25': form.processing }"
+                    :disabled="form.processing"
+                >
+                    Оновити та увійти
                 </PrimaryButton>
             </div>
         </form>
