@@ -31,7 +31,7 @@ const showingNavigationDropdown = ref(false);
                                 </NavLink>
 
                                 <NavLink
-                                    v-if="$page.props.auth.user.role === 'superadmin'"
+                                    v-if="$page.props.auth.user && $page.props.auth.user.role === 'superadmin'"
                                     :href="route('admin.control')"
                                     :active="route().current('admin.control')"
                                     class="text-[10px] uppercase font-black tracking-[0.2em] text-indigo-400 hover:text-indigo-300 transition-all"
@@ -42,7 +42,7 @@ const showingNavigationDropdown = ref(false);
                         </div>
 
                         <div class="hidden sm:flex sm:items-center sm:ms-6">
-                            <div class="flex items-center gap-4 bg-white/[0.03] p-1.5 pr-5 rounded-2xl border border-white/10 hover:bg-white/[0.07] transition-all cursor-pointer group">
+                            <div v-if="$page.props.auth.user" class="flex items-center gap-4 bg-white/[0.03] p-1.5 pr-5 rounded-2xl border border-white/10 hover:bg-white/[0.07] transition-all cursor-pointer group">
                                 <Link :href="route('profile.edit')" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg group-hover:scale-105 transition-transform overflow-hidden">
                                     <img v-if="$page.props.auth.user.avatar" :src="$page.props.auth.user.avatar" class="w-full h-full object-cover" />
                                     <span v-else>{{ $page.props.auth.user.name.charAt(0) }}</span>
@@ -51,6 +51,11 @@ const showingNavigationDropdown = ref(false);
                                     <div class="text-[11px] font-black text-white leading-none uppercase tracking-wide">{{ $page.props.auth.user.name }}</div>
                                     <Link :href="route('logout')" method="post" as="button" class="text-[9px] font-bold text-slate-500 hover:text-rose-500 transition-colors uppercase">Вийти</Link>
                                 </div>
+                            </div>
+
+                            <div v-else class="flex gap-4">
+                                <Link :href="route('login')" class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition">Увійти</Link>
+                                <Link :href="route('register')" class="bg-indigo-600 px-6 py-2 rounded-xl text-[10px] font-black uppercase text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-500 transition">Реєстрація</Link>
                             </div>
                         </div>
 
@@ -68,7 +73,11 @@ const showingNavigationDropdown = ref(false);
                 <div :class="{'block': showingNavigationDropdown, 'hidden': !showingNavigationDropdown}" class="sm:hidden bg-slate-950 border-t border-white/5">
                     <div class="pt-2 pb-3 space-y-1 px-4">
                         <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">Стрічка</ResponsiveNavLink>
-                        <ResponsiveNavLink v-if="$page.props.auth.user.role === 'superadmin'" :href="route('admin.control')" class="text-indigo-400">Адмін-панель</ResponsiveNavLink>
+                        <ResponsiveNavLink v-if="$page.props.auth.user && $page.props.auth.user.role === 'superadmin'" :href="route('admin.control')" class="text-indigo-400">Адмін-панель</ResponsiveNavLink>
+                        <template v-if="!$page.props.auth.user">
+                            <ResponsiveNavLink :href="route('login')">Увійти</ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('register')">Реєстрація</ResponsiveNavLink>
+                        </template>
                     </div>
                 </div>
             </nav>

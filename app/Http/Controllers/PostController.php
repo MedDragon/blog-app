@@ -16,7 +16,8 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $filter = $request->query('filter', 'new');
+        // Отримуємо фільтр з реквесту або ставимо 'new' за замовчуванням
+        $filter = $request->query('filter', 'newest');
 
         $posts = Post::with([
             'user',
@@ -27,29 +28,30 @@ class PostController extends Controller
             'likes'
         ])
             ->withCount(['likes', 'comments'])
-            // ЛОГІКА ВІДОБРАЖЕННЯ:
-            ->when($user->role === 'admin', function ($query) use ($user) {
-                // Менеджер бачить ТІЛЬКИ свої призначені пости
+
+            // ЛОГІКА ВІДОБРАЖЕННЯ (БЕЗПЕЧНА):
+            ->when($user && $user->role === 'admin', function ($query) use ($user) {
+                // Тільки якщо юзер авторизований І він адмін/менеджер — показуємо лише його пости
                 return $query->where('manager_id', $user->id);
             })
-            // (Опціонально) Якщо хочеш, щоб юзери бачили тільки свої, додай аналогічний when для 'user'
 
-            // Сортування
-            ->when($filter === 'new', fn($q) => $q->latest())
-            ->when($filter === 'old', fn($q) => $q->oldest())
+            // Сортування постів (відповідно до твоїх методів у Dashboard)
+            ->when($filter === 'newest', fn($q) => $q->latest())
+            ->when($filter === 'oldest', fn($q) => $q->oldest())
             ->when($filter === 'popular', fn($q) => $q->orderBy('likes_count', 'desc'))
-            ->when($filter === 'discussed', fn($q) => $q->orderBy('comments_count', 'desc'))
+            ->when($filter === 'hyped', fn($q) => $q->orderBy('comments_count', 'desc'))
+
             ->get()
             ->map(function ($post) {
-                // Лайк поста
+                // Перевірка лайка поста (безпечно для гостя)
                 $post->is_liked = Auth::check() && $post->likes->where('user_id', Auth::id())->isNotEmpty();
 
-                // Лайки коментарів
+                // Перевірка лайків коментарів
                 $post->comments->each(function ($comment) {
                     $comment->is_liked = Auth::check() && $comment->likes->where('user_id', Auth::id())->isNotEmpty();
                 });
 
-                // Сортування коментарів за популярністю
+                // Сортування коментарів за популярністю (твоя фішка)
                 $post->setRelation('comments', $post->comments->sortByDesc('likes_count')->values());
 
                 return $post;
@@ -63,6 +65,7 @@ class PostController extends Controller
 
     public function store(Request $request, DealDistributionService $distributor)
     {
+        // Цей метод все ще захищений мідлваром auth у routes/web.php
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -75,7 +78,7 @@ class PostController extends Controller
             'external_id' => (string) str()->uuid(),
         ]);
 
-        // Призначаємо адміна згідно з відсотками (вагою)
+        // Твоя система розподілу навантаження
         $distributor->assignManager($post);
 
         return redirect()->back()->with('success', 'Пост створено та призначено менеджеру!');

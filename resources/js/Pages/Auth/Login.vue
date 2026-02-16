@@ -29,7 +29,19 @@ const submit = () => {
     <GuestLayout>
         <Head title="Вхід в систему" />
 
-        <div class="mb-10 text-center">
+        <div class="absolute top-6 left-6 z-50">
+            <Link
+                href="/"
+                class="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-indigo-400 transition-all group p-2"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                </svg>
+                Назад
+            </Link>
+        </div>
+
+        <div class="mb-10 text-center mt-10 relative">
             <h1 class="text-4xl font-black text-white uppercase italic tracking-tighter">
                 З поверненням <span class="text-indigo-500 italic">!</span>
             </h1>
@@ -71,7 +83,7 @@ const submit = () => {
                 <TextInput
                     id="password"
                     type="password"
-                    class="block w-full bg-slate-900/50 border-white/10 text-white placeholder:text-slate-700 rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500 transition-all"
+                    class="block w-full bg-slate-900/50 border-white/10 text-white placeholder:text-slate-700 rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500 transition-all font-bold"
                     v-model="form.password"
                     required
                     autocomplete="current-password"

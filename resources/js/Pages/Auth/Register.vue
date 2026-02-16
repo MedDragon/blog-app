@@ -24,7 +24,19 @@ const submit = () => {
     <GuestLayout>
         <Head title="Створити акаунт" />
 
-        <div class="mb-10 text-center">
+        <div class="absolute top-6 left-6 z-50">
+            <Link
+                href="/"
+                class="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-indigo-400 transition-all group p-2"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                </svg>
+                Головна
+            </Link>
+        </div>
+
+        <div class="mb-10 text-center mt-10 relative">
             <h1 class="text-4xl font-black text-white uppercase italic tracking-tighter">Реєстрація</h1>
             <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mt-3 opacity-60">Приєднуйтесь до нашої спільноти</p>
         </div>
@@ -65,7 +77,7 @@ const submit = () => {
                     <TextInput
                         id="password"
                         type="password"
-                        class="block w-full bg-slate-900/50 border-white/10 text-white rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500"
+                        class="block w-full bg-slate-900/50 border-white/10 text-white rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500 font-bold"
                         v-model="form.password"
                         required
                         autocomplete="new-password"
@@ -77,7 +89,7 @@ const submit = () => {
                     <TextInput
                         id="password_confirmation"
                         type="password"
-                        class="block w-full bg-slate-900/50 border-white/10 text-white rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500"
+                        class="block w-full bg-slate-900/50 border-white/10 text-white rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500 font-bold"
                         v-model="form.password_confirmation"
                         required
                         autocomplete="new-password"
@@ -89,7 +101,7 @@ const submit = () => {
 
             <div class="pt-4">
                 <PrimaryButton
-                    class="w-full justify-center py-5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-lg shadow-indigo-500/20 border-none transition-all"
+                    class="w-full justify-center py-5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-lg shadow-indigo-500/20 border-none transition-all active:scale-[0.98]"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >

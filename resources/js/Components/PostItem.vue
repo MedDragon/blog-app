@@ -4,7 +4,7 @@ import CommentItem from './CommentItem.vue';
 
 const props = defineProps({
     post: Object,
-    user: Object, // Це $page.props.auth.user
+    user: Object, // Може бути null для гостя
     editingPostId: Number,
     expandedPosts: Object,
     expandedComments: Object,
@@ -17,14 +17,17 @@ const emit = defineEmits([
     'delete-comment', 'toggle-like-comment'
 ]);
 
-// Перевірка прав (Твоя логіка)
+// БЕЗПЕЧНА ПЕРЕВІРКА ПРАВ
 const canEditOrDelete = computed(() => {
+    // Якщо користувач не залогінений, він нічого не може редагувати
+    if (!props.user) return false;
+
     if (props.user.role === 'superadmin') return true;
     if (props.user.role === 'admin' && props.post.manager_id === props.user.id) return true;
     return props.post.user_id === props.user.id;
 });
 
-// --- СОРТУВАННЯ КОМЕНТАРІВ (Твоя логіка збережена) ---
+// --- СОРТУВАННЯ КОМЕНТАРІВ ---
 const commentSortMethod = ref('newest');
 const sortedComments = computed(() => {
     let list = props.post.comments.filter(c => !c.parent_id);
@@ -65,7 +68,7 @@ const getRepliesCount = (commentId) => props.post.comments.filter(c => c.parent_
                     <h3 class="text-3xl font-black text-white tracking-tight leading-[1.1] italic uppercase">
                         {{ post.title }}
                     </h3>
-                    <p v-if="user.role === 'superadmin' && post.manager" class="text-[10px] font-black text-indigo-400 mt-3 uppercase tracking-widest">
+                    <p v-if="user && user.role === 'superadmin' && post.manager" class="text-[10px] font-black text-indigo-400 mt-3 uppercase tracking-widest">
                         Куратор: {{ post.manager.name }}
                     </p>
                 </div>
@@ -166,13 +169,3 @@ const getRepliesCount = (commentId) => props.post.comments.filter(c => c.parent_
         </div>
     </div>
 </template>
-
-<style scoped>
-.animate-in {
-    animation: fadeIn 0.4s ease-out;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-</style>

@@ -8,46 +8,74 @@ defineProps({
 </script>
 
 <template>
-    <Head title="Welcome" />
+    <Head title="Вітаємо у Prostir" />
 
     <div class="relative min-h-screen bg-gray-900 flex items-center justify-center overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/20 rounded-full blur-[120px]"></div>
-            <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/20 rounded-full blur-[120px]"></div>
+            <div class="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s"></div>
         </div>
 
         <div class="relative z-10 text-center px-4">
-            <div class="mb-6 flex justify-center">
-                <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-2xl rotate-3 hover:rotate-0 transition duration-500">
-                    <svg class="w-12 h-12 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M24 22.525H0V1.475h24v21.05zM1.5 21.025h21V2.975h-21v18.05z"/><path d="M15.45 7.425h-6.9v1.5h6.9v-1.5zM15.45 11.25h-6.9v1.5h6.9v-1.5zM12.45 15.075h-3.9v1.5h3.9v-1.5z"/></svg>
+            <div class="mb-12 flex justify-center group">
+                <div class="relative w-24 h-24 flex items-center justify-center transition-all duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-indigo-600 rounded-[2.5rem] rotate-12 group-hover:rotate-0 transition-transform duration-500 shadow-2xl shadow-indigo-500/50"></div>
+                    <div class="absolute inset-0 bg-slate-800 rounded-[2.5rem] -rotate-6 group-hover:rotate-0 transition-transform duration-500 border border-white/10 backdrop-blur-xl"></div>
+                    <span class="relative text-white font-black text-5xl italic tracking-tighter select-none">P</span>
                 </div>
             </div>
 
-            <h1 class="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter mb-4">
-                Tech<span class="text-indigo-500">Blog</span>
+            <h1 class="text-7xl md:text-9xl font-black text-white uppercase tracking-tighter mb-6 italic">
+                Prostir<span class="text-indigo-500">.</span>
             </h1>
-            <p class="text-gray-400 text-lg md:text-xl max-w-xl mx-auto mb-10 font-medium">
-                Діліться ідеями, обговорюйте новини та ставте лайки найкращим постам нашої спільноти.
+
+            <p class="text-slate-400 text-sm md:text-base max-w-xl mx-auto mb-12 font-black uppercase tracking-[0.3em] leading-relaxed opacity-70">
+                Платформа для обміну думками, новинами та розвитку спільноти.
             </p>
 
-            <div v-if="canLogin" class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Link v-if="$page.props.auth.user" :href="route('dashboard')" class="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-700 transition shadow-xl shadow-indigo-500/20">
-                    Перейти до стрічки
+            <div v-if="canLogin" class="flex flex-col gap-4 items-center">
+
+                <Link
+                    v-if="$page.props.auth.user"
+                    :href="route('dashboard')"
+                    class="px-12 py-5 bg-indigo-600 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-indigo-500 transition-all shadow-[0_20px_40px_rgba(79,70,229,0.3)] active:scale-95"
+                >
+                    Перейти до консолі
                 </Link>
 
                 <template v-else>
-                    <Link :href="route('login')" class="px-10 py-4 bg-white text-gray-900 rounded-2xl font-black uppercase tracking-widest hover:bg-gray-100 transition shadow-xl">
-                        Увійти
-                    </Link>
-                    <Link v-if="canRegister" :href="route('register')" class="px-10 py-4 bg-transparent border-2 border-gray-700 text-white rounded-2xl font-black uppercase tracking-widest hover:border-white transition">
-                        Реєстрація
-                    </Link>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <Link
+                            :href="route('login')"
+                            class="px-10 py-5 bg-white text-gray-900 rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-slate-200 transition-all shadow-2xl active:scale-95"
+                        >
+                            Увійти
+                        </Link>
+
+                        <Link
+                            :href="route('dashboard')"
+                            class="px-10 py-5 bg-slate-800/80 text-white border border-white/10 rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-slate-700 transition-all active:scale-95 backdrop-blur-md"
+                        >
+                            Переглянути як гість
+                        </Link>
+
+                        <Link
+                            v-if="canRegister"
+                            :href="route('register')"
+                            class="px-10 py-5 bg-transparent border-2 border-indigo-600 text-indigo-400 rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:border-indigo-400 hover:text-indigo-300 transition-all active:scale-95 shadow-[0_0_20px_rgba(79,70,229,0.2)]"
+                        >
+                            Реєстрація
+                        </Link>
+                    </div>
                 </template>
             </div>
         </div>
 
-        <div class="absolute bottom-10 text-gray-600 text-[10px] font-black uppercase tracking-[0.3em]">
-            Built with Laravel 11 • Vue 3 • Tailwind CSS
+        <div class="absolute bottom-10 flex flex-col items-center gap-2">
+            <div class="h-px w-12 bg-indigo-500/30 mb-2"></div>
+            <div class="text-slate-700 text-[9px] font-black uppercase tracking-[0.5em]">
+                Prostir Engine 2026 • v1.0
+            </div>
         </div>
     </div>
 </template>
