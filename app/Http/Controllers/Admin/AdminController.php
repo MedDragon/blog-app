@@ -57,15 +57,43 @@ class AdminController extends Controller
         return back();
     }
 
+    public function downgrade(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Ви не можете понизити себе.');
+        }
+
+        // Оновлюємо роль ТА вагу
+        $user->update([
+            'role' => 'user',
+            'assignment_weight' => 0
+        ]);
+
+        return back();
+    }
+
     public function loginAs(User $user)
     {
-        // Тільки суперадмін може "красти" сесії
-        if (Auth::user()->role !== 'superadmin') {
+        // Тільки супер адмін може це робити
+        if (auth()->user()->role !== 'superadmin') {
             abort(403);
         }
 
-        Auth::login($user);
+        // Зберігаємо ID адміна, щоб можна було повернутися (опціонально)
+        session(['admin_user_id' => auth()->id()]);
 
-        return redirect()->route('dashboard')->with('success', 'Ви увійшли як ' . $user->name);
+        auth()->login($user);
+
+        return redirect()->route('dashboard');
+    }
+
+    public function destroyUser(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Ви не можете видалити себе.');
+        }
+
+        $user->delete();
+        return back();
     }
 }

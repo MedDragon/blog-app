@@ -40,6 +40,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/users/{user}/weight', [AdminController::class, 'updateWeight'])->name('update-weight');
         Route::patch('/users/{user}/role', [AdminController::class, 'updateRole'])->name('update-role');
         Route::post('/login-as/{user}', [AdminController::class, 'loginAs'])->name('login-as');
+        Route::patch('/users/{user}/downgrade', [AdminController::class, 'downgrade'])->name('downgrade');
+        Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('destroy-user');
     });
 });
 
