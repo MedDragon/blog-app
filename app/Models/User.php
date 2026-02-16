@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'avatar',
         'bio',
+        'assignment_weight',
     ];
 
     /**
@@ -46,5 +47,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Пости, за які цей юзер відповідає як менеджер
+    public function managedPosts()
+    {
+        return $this->hasMany(Post::class, 'manager_id');
     }
 }

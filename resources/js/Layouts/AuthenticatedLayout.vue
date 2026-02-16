@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from 'vue';
-// Використовуємо відносні шляхи, щоб точно оминути проблеми з аліасами Vite
 import ApplicationLogo from '../Components/ApplicationLogo.vue';
 import NavLink from '../Components/NavLink.vue';
 import ResponsiveNavLink from '../Components/ResponsiveNavLink.vue';
@@ -26,6 +25,15 @@ const showingNavigationDropdown = ref(false);
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')" class="text-xs uppercase font-bold tracking-widest">
                                     Стрічка
+                                </NavLink>
+
+                                <NavLink
+                                    v-if="$page.props.auth.user.role === 'superadmin'"
+                                    :href="route('admin.control')"
+                                    :active="route().current('admin.control')"
+                                    class="text-xs uppercase font-bold tracking-widest text-indigo-600"
+                                >
+                                    Адмін-панель
                                 </NavLink>
                             </div>
                         </div>
@@ -58,6 +66,15 @@ const showingNavigationDropdown = ref(false);
                 <div :class="{'block': showingNavigationDropdown, 'hidden': !showingNavigationDropdown}" class="sm:hidden bg-white border-t border-gray-100 shadow-xl">
                     <div class="pt-2 pb-3 space-y-1">
                         <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">Стрічка</ResponsiveNavLink>
+
+                        <ResponsiveNavLink
+                            v-if="$page.props.auth.user.role === 'superadmin'"
+                            :href="route('admin.control')"
+                            :active="route().current('admin.control')"
+                            class="text-indigo-600 font-black"
+                        >
+                            Адмін-панель
+                        </ResponsiveNavLink>
                     </div>
 
                     <div class="pt-4 pb-1 border-t border-gray-200 bg-gray-50/50">

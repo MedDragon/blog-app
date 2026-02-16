@@ -34,4 +34,10 @@ class Post extends Model
     public function getIsLikedAttribute() {
         return $this->likes()->where('user_id', auth()->id())->exists();
     }
+
+    // Менеджер, який курує цей пост
+    public function manager()
+    {
+        return $this->belongsTo(User::class, 'manager_id');
+    }
 }

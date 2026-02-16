@@ -16,15 +16,26 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Створюємо тестового пешого
+        // 1. Супер-адмін
         User::factory()->create([
-            'name' => 'Artem Test',
-            'email' => 'test@example.com',
-            'password' => bcrypt('1'), // щоб точно знати пароль
+            'name' => 'Artem Boss',
+            'email' => 'admin@example.com',
+            'role' => 'superadmin',
+            'password' => bcrypt('1'),
         ]);
 
-        // Потім створюємо інших
-        User::factory(10)->create();
-        Post::factory(30)->create();
+        // 2. Створюємо адмінів з різною вагою
+        $admin1 = User::factory()->create(['name' => 'Pro Admin', 'role' => 'admin', 'assignment_weight' => 70]);
+        $admin2 = User::factory()->create(['name' => 'Junior Admin', 'role' => 'admin', 'assignment_weight' => 30]);
+
+        // 3. Юзери
+        $users = User::factory(10)->create(['role' => 'user']);
+
+        // 4. Створюємо пости і розподіляємо їх
+        $service = new \App\Services\DealDistributionService();
+
+        \App\Models\Post::factory(20)->create()->each(function ($post) use ($service) {
+            $service->assignManager($post);
+        });
     }
 }

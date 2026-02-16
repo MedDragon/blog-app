@@ -4,7 +4,7 @@ import CommentItem from './CommentItem.vue';
 
 const props = defineProps({
     post: Object,
-    user: Object,
+    user: Object, // Це $page.props.auth.user
     editingPostId: Number,
     expandedPosts: Object,
     expandedComments: Object,
@@ -17,29 +17,28 @@ const emit = defineEmits([
     'delete-comment', 'toggle-like-comment'
 ]);
 
-// --- СОРТУВАННЯ КОМЕНТАРІВ ---
+// Перевірка прав (Helper functions)
+const canEditOrDelete = computed(() => {
+    if (props.user.role === 'superadmin') return true;
+    if (props.user.role === 'admin' && props.post.manager_id === props.user.id) return true;
+    return props.post.user_id === props.user.id;
+});
+
+// --- СОРТУВАННЯ КОМЕНТАРІВ (Твоя логіка без змін) ---
 const commentSortMethod = ref('newest');
-
 const sortedComments = computed(() => {
-    // Беремо тільки батьківські коментарі
     let list = props.post.comments.filter(c => !c.parent_id);
-
     if (commentSortMethod.value === 'newest') return list.sort((a, b) => b.id - a.id);
     if (commentSortMethod.value === 'oldest') return list.sort((a, b) => a.id - b.id);
-
     if (commentSortMethod.value === 'popular') {
         return list.sort((a, b) => {
-            // Рахуємо вагу для А: лайки коментаря + 0.5 * лайки всіх його відповідей
             const repliesA = props.post.comments.filter(c => c.parent_id === a.id);
             const weightA = (a.likes_count || 0) + (repliesA.reduce((sum, r) => sum + (r.likes_count || 0), 0) * 0.5);
-
             const repliesB = props.post.comments.filter(c => c.parent_id === b.id);
             const weightB = (b.likes_count || 0) + (repliesB.reduce((sum, r) => sum + (r.likes_count || 0), 0) * 0.5);
-
             return weightB - weightA;
         });
     }
-
     if (commentSortMethod.value === 'active') {
         return list.sort((a, b) => {
             const repliesA = props.post.comments.filter(c => c.parent_id === a.id).length;
@@ -62,9 +61,14 @@ const getRepliesCount = (commentId) => props.post.comments.filter(c => c.parent_
                 <div v-if="editingPostId === post.id" class="flex-1 mr-4">
                     <slot name="edit-post-form"></slot>
                 </div>
-                <h3 v-else class="text-3xl font-black text-gray-900 tracking-tight leading-[1.1]">{{ post.title }}</h3>
-                <span class="px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-2xl text-[10px] font-black uppercase tracking-widest shrink-0 ml-4 shadow-sm border border-indigo-100/50">
-                    {{ post.source }}
+                <div v-else class="flex-1">
+                    <h3 class="text-3xl font-black text-gray-900 tracking-tight leading-[1.1]">{{ post.title }}</h3>
+                    <p v-if="user.role === 'superadmin' && post.manager" class="text-[10px] font-bold text-indigo-400 mt-2 uppercase tracking-tighter">
+                        Куратор: {{ post.manager.name }}
+                    </p>
+                </div>
+                <span class="px-4 py-1.5 bg-gray-50 text-gray-400 rounded-2xl text-[10px] font-black uppercase tracking-widest shrink-0 ml-4 shadow-sm">
+                    ID: {{ post.id }}
                 </span>
             </div>
 
@@ -74,7 +78,8 @@ const getRepliesCount = (commentId) => props.post.comments.filter(c => c.parent_
                     <button v-if="post.content.length > 400" @click="$emit('toggle-post', post.id)" class="mt-4 text-indigo-600 font-black uppercase text-[11px] tracking-[0.2em] hover:gap-3 transition-all flex items-center">
                         {{ expandedPosts[post.id] ? 'Згорнути' : 'Читати повністю' }}
                     </button>
-                    <div v-if="post.user_id === user.id" class="flex gap-4">
+
+                    <div v-if="canEditOrDelete" class="flex gap-4">
                         <button @click="$emit('start-edit', post)" class="mt-4 text-gray-400 font-black uppercase text-[11px] tracking-[0.2em] hover:text-indigo-500 transition-colors">Редагувати</button>
                         <button @click="$emit('delete-post', post.id)" class="mt-4 text-red-300 font-black uppercase text-[11px] tracking-[0.2em] hover:text-red-600 transition-colors">Видалити</button>
                     </div>
@@ -109,15 +114,10 @@ const getRepliesCount = (commentId) => props.post.comments.filter(c => c.parent_
 
         <div v-if="expandedComments[post.id]" class="p-8 pt-0 bg-[#fafbfd]/80 border-t border-gray-50 animate-in">
             <div class="pt-8 space-y-6">
-
                 <div class="flex items-center justify-between mb-2 px-2">
                     <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Сортувати:</span>
                     <div class="flex gap-4">
-                        <button v-for="m in ['newest', 'popular', 'active', 'oldest']" :key="m"
-                                @click="commentSortMethod = m"
-                                :class="commentSortMethod === m ? 'text-indigo-600 scale-110' : 'text-gray-300 hover:text-gray-400'"
-                                class="text-[9px] font-black uppercase transition-all tracking-tighter"
-                        >
+                        <button v-for="m in ['newest', 'popular', 'active', 'oldest']" :key="m" @click="commentSortMethod = m" :class="commentSortMethod === m ? 'text-indigo-600 scale-110' : 'text-gray-300 hover:text-gray-400'" class="text-[9px] font-black uppercase transition-all tracking-tighter">
                             <span v-if="m === 'newest'">Нові</span>
                             <span v-if="m === 'popular'">Топ</span>
                             <span v-if="m === 'active'">Дискусії</span>
