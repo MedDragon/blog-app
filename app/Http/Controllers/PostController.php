@@ -53,4 +53,27 @@ class PostController extends Controller
 
         return back()->with('status', 'Пост видалено');
     }
+
+    public function index(Request $request)
+    {
+        $filter = $request->query('filter', 'new'); // за замовчуванням 'нові'
+
+        $posts = Post::with(['user', 'comments.user'])
+            ->withCount(['likes', 'comments']) // Laravel сам порахує кількість
+            ->when($filter === 'new', fn($q) => $q->latest())
+            ->when($filter === 'old', fn($q) => $q->oldest())
+            ->when($filter === 'popular', fn($q) => $q->orderBy('likes_count', 'desc'))
+            ->when($filter === 'discussed', fn($q) => $q->orderBy('comments_count', 'desc'))
+            ->get();
+
+        // Сортування коментарів всередині кожного поста
+        $posts->each(function ($post) {
+            $post->setRelation('comments', $post->comments->sortByDesc('likes_count'));
+        });
+
+        return inertia('Dashboard', [
+            'posts' => $posts,
+            'currentFilter' => $filter
+        ]);
+    }
 }
