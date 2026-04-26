@@ -23,9 +23,11 @@ class HandleInertiaRequests extends Middleware
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
-                    'role' => $request->user()->role, // ЦЕ ВАЖЛИВО!
+                    'role' => $request->user()->role,
                     'avatar' => $request->user()->avatar,
                 ] : null,
+                // Додаємо цей прапорець:
+                'is_impersonating' => $request->session()->has('admin_user_id'),
             ],
         ];
     }

@@ -42,6 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/login-as/{user}', [AdminController::class, 'loginAs'])->name('login-as');
         Route::patch('/users/{user}/downgrade', [AdminController::class, 'downgrade'])->name('downgrade');
         Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('destroy-user');
+        Route::post('/return-to-admin', [AdminController::class, 'returnToAdmin'])->name('return-to-admin');
     });
 });
 

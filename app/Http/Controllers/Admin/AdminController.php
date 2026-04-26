@@ -96,4 +96,19 @@ class AdminController extends Controller
         $user->delete();
         return back();
     }
+
+    public function returnToAdmin()
+    {
+        $adminId = session()->pull('admin_user_id'); // Беремо ID і відразу видаляємо з сесії
+
+        if ($adminId) {
+            $admin = User::find($adminId);
+            if ($admin) {
+                Auth::login($admin);
+                return redirect()->route('admin.control');
+            }
+        }
+
+        return redirect()->route('dashboard')->with('error', 'Неможливо повернутися.');
+    }
 }

@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // 2. Створюємо адмінів з різною вагою
-        $admin1 = User::factory()->create(['name' => 'Pro Admin', 'role' => 'admin', 'assignment_weight' => 70]);
-        $admin2 = User::factory()->create(['name' => 'Junior Admin', 'role' => 'admin', 'assignment_weight' => 30]);
+        $admin1 = User::factory()->create(['name' => 'Pro Admin', 'role' => 'admin', 'assignment_weight' => 70, 'email' => 'admin1@example.com', 'password' => bcrypt('1')]);
+        $admin2 = User::factory()->create(['name' => 'Junior Admin', 'role' => 'admin', 'assignment_weight' => 30, 'email' => 'admin2@example.com', 'password' => bcrypt('1')]);
 
         // 3. Юзери
         $users = User::factory(10)->create(['role' => 'user']);

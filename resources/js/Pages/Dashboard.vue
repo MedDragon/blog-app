@@ -6,10 +6,13 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps({ posts: Array });
 
+// Отримуємо дані сторінки (включаючи наш новий прапорець auth.is_impersonating)
+const pageProps = computed(() => usePage().props);
+
 // Юзер (завжди перевіряємо наявність)
 const user = computed(() => {
     try {
-        return usePage().props.auth?.user || null;
+        return pageProps.value.auth?.user || null;
     } catch (e) {
         return null;
     }
@@ -33,18 +36,15 @@ const editPostForm = useForm({ title: '', content: '' });
 const commentForm = useForm({ body: '', post_id: null, parent_id: null });
 const editCommentForm = useForm({ body: '' });
 
-// МЕТОД: Перемикання коментарів (БЕЗПЕЧНИЙ)
+// МЕТОД: Перемикання коментарів
 const handleToggleComments = (id) => {
-    // Використовуємо просту перевірку, щоб не зациклити рендер
     if (!id) return;
-
     const stringId = String(id);
     if (expandedComments.value[stringId]) {
         delete expandedComments.value[stringId];
     } else {
         expandedComments.value[stringId] = true;
     }
-    // Примусово оновлюємо посилання на об'єкт для Vue
     expandedComments.value = { ...expandedComments.value };
 };
 
@@ -72,7 +72,7 @@ const checkGuest = (callback) => {
     else callback();
 };
 
-// МЕТОДИ (Лайки, Коменти, Пости)
+// МЕТОДИ
 const toggleLike = (id, type) => checkGuest(() => {
     router.post(route('likes.toggle'), { id, type }, { preserveScroll: true });
 });
@@ -114,6 +114,30 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
     <Head title="Стрічка" />
     <AuthenticatedLayout>
         <template #header>
+            <div v-if="pageProps.auth.is_impersonating"
+                 class="mb-6 bg-indigo-600/20 border border-indigo-500/50 backdrop-blur-md p-4 rounded-3xl flex items-center justify-between animate-pulse">
+                <div class="flex items-center gap-3">
+                    <div class="bg-indigo-600 p-2 rounded-full">
+                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Режим перегляду</p>
+                        <p class="text-white text-sm font-bold">Акаунт: {{ user?.name }}</p>
+                    </div>
+                </div>
+                <Link
+                    :href="route('admin.return-to-admin')"
+                    method="post"
+                    as="button"
+                    class="bg-white text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-indigo-500 hover:text-white transition-all shadow-lg"
+                >
+                    Назад в Адмінку
+                </Link>
+            </div>
+
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <h2 class="font-black text-4xl text-white uppercase italic tracking-tighter">Стрічка Prostir</h2>
                 <div class="flex bg-slate-900/60 p-1.5 rounded-2xl border border-white/10 backdrop-blur-xl overflow-x-auto no-scrollbar shadow-2xl">
@@ -165,7 +189,6 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
         <div v-if="isAuthWallOpen" class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-2xl">
             <div class="bg-slate-900 border border-indigo-500/30 w-full max-w-md rounded-[3.5rem] p-12 text-center">
                 <h3 class="text-3xl font-black text-white uppercase mb-4 italic">Хочеш у Prostir?</h3>
-                <p class="text-slate-400 text-sm mb-10 font-bold uppercase tracking-widest opacity-60">Потрібна реєстрація</p>
                 <div class="space-y-4">
                     <Link :href="route('login')" class="block w-full bg-white text-black py-5 rounded-2xl font-black uppercase text-xs">Увійти</Link>
                     <Link :href="route('register')" class="block w-full bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase text-xs">Реєстрація</Link>
