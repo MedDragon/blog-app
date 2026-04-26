@@ -2,9 +2,8 @@
 
 namespace Tests\Browser;
 
-use App\Models\User;
-use Tests\Browser\Pages\Login;
 use Laravel\Dusk\Browser;
+use Tests\Browser\Pages\Login;
 use Tests\DuskTestCase;
 
 class LoginTest extends DuskTestCase
