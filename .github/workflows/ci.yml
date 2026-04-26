@@ -2,9 +2,9 @@ name: Laravel CI
 
 on:
   push:
-    branches: [ "master", "main" ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "master", "main" ]
+    branches: [ "main", "master" ]
 
 jobs:
   laravel-tests:
@@ -16,7 +16,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3' # Версія, яка стабільно підтримує твій стек
+          php-version: '8.3'
           extensions: mbstring, xml, sqlite3, pdo_sqlite
 
       - name: Install Dependencies
@@ -28,10 +28,8 @@ jobs:
       - name: Generate key
         run: php artisan key:generate
 
-      # Перевірка стилю коду (Linter)
       - name: Run Pint (Style Check)
         run: ./vendor/bin/pint --test
 
-      # Запуск тестів
       - name: Execute tests
         run: php artisan test
