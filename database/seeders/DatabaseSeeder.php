@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Post;
+use App\Models\User;
+use App\Services\DealDistributionService;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -32,9 +33,9 @@ class DatabaseSeeder extends Seeder
         $users = User::factory(10)->create(['role' => 'user']);
 
         // 4. Створюємо пости і розподіляємо їх
-        $service = new \App\Services\DealDistributionService();
+        $service = new DealDistributionService;
 
-        \App\Models\Post::factory(20)->create()->each(function ($post) use ($service) {
+        Post::factory(20)->create()->each(function ($post) use ($service) {
             $service->assignManager($post);
         });
     }

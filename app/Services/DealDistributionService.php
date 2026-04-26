@@ -2,16 +2,20 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Post;
+use App\Models\User;
 
-class DealDistributionService {
-    public function assignManager(Post $post) {
+class DealDistributionService
+{
+    public function assignManager(Post $post)
+    {
         $admins = User::where('role', 'admin')
             ->where('assignment_weight', '>', 0)
             ->get();
 
-        if ($admins->isEmpty()) return;
+        if ($admins->isEmpty()) {
+            return;
+        }
 
         $chosenManager = $admins->sortBy(function ($admin) {
             // Використовуємо запит до БД щоразу, щоб бачити реальну кількість

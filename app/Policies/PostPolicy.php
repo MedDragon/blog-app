@@ -32,9 +32,13 @@ class PostPolicy
     public function delete(User $user, Post $post): bool
     {
         // Аналогічно до редагування
-        if ($user->role === 'superadmin') return true;
+        if ($user->role === 'superadmin') {
+            return true;
+        }
 
-        if ($user->role === 'admin' && $post->manager_id === $user->id) return true;
+        if ($user->role === 'admin' && $post->manager_id === $user->id) {
+            return true;
+        }
 
         return $user->id === $post->user_id;
     }

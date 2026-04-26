@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Post;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Post>
+ * @extends Factory<Post>
  */
 class PostFactory extends Factory
 {
@@ -22,7 +23,7 @@ class PostFactory extends Factory
             'user_id' => User::exists() ? User::inRandomOrder()->first()->id : User::factory(),
             'title' => fake()->realText(50), // realText генерує більш змістовні фрази мовою локалізації
             'content' => fake()->realText(500), // Текст посту українською
-            'source' => 'Джерело ' . fake()->numberBetween(1, 5), // Локалізуємо і джерела
+            'source' => 'Джерело '.fake()->numberBetween(1, 5), // Локалізуємо і джерела
             'external_id' => fake()->uuid(),
         ];
     }

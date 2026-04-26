@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class AdminController extends Controller
 {
@@ -20,14 +20,14 @@ class AdminController extends Controller
             'admins' => User::where('role', 'admin')
                 ->withCount('managedPosts')
                 ->get(),
-            'allUsers' => User::where('role', 'user')->get(['id', 'name', 'email', 'assignment_weight'])
+            'allUsers' => User::where('role', 'user')->get(['id', 'name', 'email', 'assignment_weight']),
         ]);
     }
 
     public function updateWeight(Request $request, User $user)
     {
         $validated = $request->validate([
-            'weight' => 'required|numeric|min:0'
+            'weight' => 'required|numeric|min:0',
         ]);
 
         // Пряме оновлення через об'єкт
@@ -40,7 +40,7 @@ class AdminController extends Controller
     public function updateRole(Request $request, User $user)
     {
         $validated = $request->validate([
-            'role' => 'required|string'
+            'role' => 'required|string',
         ]);
 
         $user->role = $validated['role'];
@@ -66,7 +66,7 @@ class AdminController extends Controller
         // Оновлюємо роль ТА вагу
         $user->update([
             'role' => 'user',
-            'assignment_weight' => 0
+            'assignment_weight' => 0,
         ]);
 
         return back();
@@ -94,6 +94,7 @@ class AdminController extends Controller
         }
 
         $user->delete();
+
         return back();
     }
 
@@ -105,6 +106,7 @@ class AdminController extends Controller
             $admin = User::find($adminId);
             if ($admin) {
                 Auth::login($admin);
+
                 return redirect()->route('admin.control');
             }
         }

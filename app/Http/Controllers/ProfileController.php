@@ -32,9 +32,9 @@ class ProfileController extends Controller
         if ($request->hasFile('avatar')) {
             // Пріоритет 1: Якщо завантажено новий файл
             $file = $request->file('avatar');
-            $fileName = $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $fileName = $user->id.'_'.time().'.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('avatars', $fileName, 'public');
-            $user->avatar = '/storage/' . $path;
+            $user->avatar = '/storage/'.$path;
         } elseif ($request->filled('avatar_url')) {
             // Пріоритет 2: Якщо файлу немає, але вставили посилання
             $user->avatar = $request->input('avatar_url');

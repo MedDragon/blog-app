@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Post extends Model
@@ -26,12 +26,14 @@ class Post extends Model
         return $this->hasMany(Comment::class);
     }
 
-    public function likes() {
+    public function likes()
+    {
         return $this->morphMany(Like::class, 'likeable');
     }
 
-// Допоміжне поле, щоб знати, чи лайкнув поточний юзер цей об'єкт
-    public function getIsLikedAttribute() {
+    // Допоміжне поле, щоб знати, чи лайкнув поточний юзер цей об'єкт
+    public function getIsLikedAttribute()
+    {
         return $this->likes()->where('user_id', auth()->id())->exists();
     }
 

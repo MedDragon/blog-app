@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Services\DealDistributionService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class PostController extends Controller
@@ -22,10 +22,10 @@ class PostController extends Controller
         $posts = Post::with([
             'user',
             'manager',
-            'comments' => function($query) {
+            'comments' => function ($query) {
                 $query->with(['user', 'likes'])->withCount('likes');
             },
-            'likes'
+            'likes',
         ])
             ->withCount(['likes', 'comments'])
 
@@ -36,10 +36,10 @@ class PostController extends Controller
             })
 
             // Сортування постів (відповідно до твоїх методів у Dashboard)
-            ->when($filter === 'newest', fn($q) => $q->latest())
-            ->when($filter === 'oldest', fn($q) => $q->oldest())
-            ->when($filter === 'popular', fn($q) => $q->orderBy('likes_count', 'desc'))
-            ->when($filter === 'hyped', fn($q) => $q->orderBy('comments_count', 'desc'))
+            ->when($filter === 'newest', fn ($q) => $q->latest())
+            ->when($filter === 'oldest', fn ($q) => $q->oldest())
+            ->when($filter === 'popular', fn ($q) => $q->orderBy('likes_count', 'desc'))
+            ->when($filter === 'hyped', fn ($q) => $q->orderBy('comments_count', 'desc'))
 
             ->get()
             ->map(function ($post) {
@@ -59,7 +59,7 @@ class PostController extends Controller
 
         return Inertia::render('Dashboard', [
             'posts' => $posts,
-            'currentFilter' => $filter
+            'currentFilter' => $filter,
         ]);
     }
 
