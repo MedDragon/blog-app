@@ -20,7 +20,7 @@ jobs:
           extensions: mbstring, xml, sqlite3, pdo_sqlite
 
       - name: Install Dependencies
-        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress
+        run: composer install --ignore-platform-reqs --prefer-dist --no-ansi --no-interaction --no-progress
 
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
