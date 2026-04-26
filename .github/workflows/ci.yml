@@ -11,25 +11,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Завантаження коду з репозиторію
       - uses: actions/checkout@v4
 
+      # 2. Налаштування PHP та необхідних розширень
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, xml, sqlite3, pdo_sqlite
+          extensions: mbstring, xml, sqlite3, pdo_sqlite, bcmath
+          tools: composer:v2
 
-      - name: Install Dependencies
+      # 3. Налаштування Node.js (потрібно для Vite/фронтенду)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # 4. Встановлення PHP залежностей
+      - name: Install Composer Dependencies
         run: composer install --ignore-platform-reqs --prefer-dist --no-ansi --no-interaction --no-progress
 
-      - name: Copy .env
-        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      # 5. Встановлення JS залежностей та збірка Vite (виправляє помилку manifest.json)
+      - name: Install NPM Dependencies & Build Assets
+        run: |
+          npm install
+          npm run build
 
-      - name: Generate key
-        run: php artisan key:generate
+      # 6. Підготовка середовища Laravel
+      - name: Prepare Application
+        run: |
+          php -r "file_exists('.env') || copy('.env.example', '.env');"
+          php artisan key:generate
+          mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache
+          chmod -R 777 storage bootstrap/cache
 
+      # 7. Перевірка стилю коду (Pint)
       - name: Run Pint (Style Check)
         run: ./vendor/bin/pint --test
 
+      # 8. Запуск тестів (PHPUnit)
       - name: Execute tests
         run: php artisan test
