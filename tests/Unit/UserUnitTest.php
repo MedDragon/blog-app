@@ -3,8 +3,8 @@
 namespace Tests\Unit;
 
 use App\Models\User;
-use PHPUnit\Framework\TestCase;
 use Mockery;
+use PHPUnit\Framework\TestCase;
 
 class UserUnitTest extends TestCase
 {
@@ -16,7 +16,7 @@ class UserUnitTest extends TestCase
     {
         $user = new User([
             'name' => 'Artem',
-            'email' => 'artem@example.com'
+            'email' => 'artem@example.com',
         ]);
 
         $this->assertEquals('Artem', $user->name);
