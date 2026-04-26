@@ -1,0 +1,17 @@
+,OS: Linux  | Browser: Chrome 146 | Resolution: 1920x1168 | Time: 26 Apr 2026 / 15:55:56  GMT+3
+
+"#","Step","Data","Exp Result","XPath","cssSelector"
+"1","Open website","http://localhost/login","","",""
+"2","Reload","","","0 element matching.",""
+"3","Click on ""Назад""","","","//a[contains(text(),'Назад')]","body > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > div:nth-child(2) > a:nth-child(1)"
+"4","Click on ""Увійти""","","","//a[contains(text(),'Увійти')]","body > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > div:nth-child(4) > div:nth-child(1) > a:nth-child(1)"
+"5","Enter ""admin@example.com"" into ""Електронна пошта""","admin@example.com","","//input[@id='email']","#email"
+"6","Enter ""******"" into ""Пароль""","******","","//input[@id='password']","#password"
+"7","Click on ""Електронна поштаПароль Забули? Запам'ятати мене Увійти Ще не маєте акаунту? Створити зараз""","","","//form[@class='space-y-6']",".space-y-6"
+"8","Click on ""Запам'ятати мене""","","","//span[@class='ms-3 text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover:text-slate-300 transition']","body > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > form:nth-child(4) > div:nth-child(3) > label:nth-child(1) > span:nth-child(2)"
+"9","Click on ""Електронна пошта""","","","//label[@for='email']","label[for='email']"
+"10","Click on ""Електронна пошта""","","","//label[@for='email']","label[for='email']"
+"11","Click on ""Електронна поштаПароль Забули? Запам'ятати мене Увійти Ще не маєте акаунту? Створити зараз""","","","//form[@class='space-y-6']",".space-y-6"
+"12","Click on ""Електронна поштаПароль Забули? Запам'ятати мене Увійти Ще не маєте акаунту? Створити зараз""","","","//form[@class='space-y-6']",".space-y-6"
+"13","Click on ""Увійти""","","","//button[@class='inline-flex items-center rounded-md border border-transparent bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white transition duration-150 ease-in-out hover:bg-gray-700 focus:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 active:bg-gray-900 w-full justify-center py-5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] border-none opacity-25']","body > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > form:nth-child(4) > div:nth-child(4) > button:nth-child(1)"
+"14","Click on ""Стрічка""","","","//a[@class='inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out text-[10px] uppercase font-black tracking-[0.2em] text-slate-400 hover:text-white transition-all']","body > div:nth-child(1) > div:nth-child(1) > div:nth-child(3) > nav:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > a:nth-child(1)"
